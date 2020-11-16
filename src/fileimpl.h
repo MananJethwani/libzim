@@ -59,8 +59,6 @@ namespace zim
       typedef std::shared_ptr<const Cluster> ClusterHandle;
       ConcurrentCache<cluster_index_type, ClusterHandle> clusterCache;
 
-      bool cacheUncompressedCluster;
-
       typedef std::vector<std::string> MimeTypes;
       MimeTypes mimeTypes;
 
