@@ -45,6 +45,10 @@
 
 namespace zim {
 
+////////////////////////////////////////////////////////////////////////////////
+// MultiPartFileReader
+////////////////////////////////////////////////////////////////////////////////
+
 MultiPartFileReader::MultiPartFileReader(std::shared_ptr<const FileCompound> source)
   : MultiPartFileReader(source, offset_t(0), source->fsize()) {}
 
@@ -213,8 +217,94 @@ bool Reader::can_read(offset_t offset, zsize_t size) const
 
 std::unique_ptr<const Reader> MultiPartFileReader::sub_reader(offset_t offset, zsize_t size) const
 {
-  ASSERT(size, <=, _size);
+  ASSERT(offset.v+size.v, <=, _size.v);
+  // TODO: can use a FileReader here if the new range fully belongs to a single part
   return std::unique_ptr<Reader>(new MultiPartFileReader(source, _offset+offset, size));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// FileReader
+////////////////////////////////////////////////////////////////////////////////
+
+FileReader::FileReader(int fd)
+  : _fhandle(std::make_shared<DEFAULTFS::FD>(fd))
+  , _offset(0)
+  , _size(_fhandle->getSize())
+{
+}
+
+FileReader::FileReader(const FileReader& freader, offset_t offset, zsize_t size)
+  : _fhandle(freader._fhandle)
+  , _offset(offset)
+  , _size(size)
+{
+}
+
+char FileReader::read(offset_t offset) const
+{
+  ASSERT(offset.v, <, _size.v);
+  offset += _offset;
+  char ret;
+  try {
+    _fhandle->readAt(&ret, zsize_t(1), offset);
+  } catch (std::runtime_error& e) {
+    //Error while reading.
+    std::ostringstream s;
+    s << "Cannot read a char.\n";
+    s << " - Reading offset at " << offset.v << "\n";
+    s << " - error is " << strerror(errno) << "\n";
+    std::error_code ec(errno, std::generic_category());
+    throw std::system_error(ec, s.str());
+  };
+  return ret;
+}
+
+void FileReader::read(char* dest, offset_t offset, zsize_t size) const
+{
+  ASSERT(offset.v, <, _size.v);
+  ASSERT(offset.v+size.v, <=, _size.v);
+  if (! size ) {
+    return;
+  }
+  offset += _offset;
+  try {
+    _fhandle->readAt(dest, size, offset);
+  } catch (std::runtime_error& e) {
+    std::ostringstream s;
+    s << "Cannot read chars.\n";
+    s << " - Reading offset at " << offset.v << "\n";
+    s << " - size is " << size.v << "\n";
+    s << " - error is " << strerror(errno) << "\n";
+    std::error_code ec(errno, std::generic_category());
+    throw std::system_error(ec, s.str());
+  };
+}
+
+const Buffer FileReader::get_buffer(offset_t offset, zsize_t size) const
+{
+  ASSERT(size, <=, _size);
+#ifdef ENABLE_USE_MMAP
+  try {
+    offset += _offset;
+    int fd = _fhandle->getNativeHandle();
+    return Buffer::makeBuffer(makeMmappedBuffer(fd, offset, size), size);
+  } catch(MMapException& e)
+#endif
+  {
+    // The range is several part, or we are on Windows.
+    // We will have to do some memory copies :/
+    // [TODO] Use Windows equivalent for mmap.
+    auto ret_buffer = Buffer::makeBuffer(size);
+    read(const_cast<char*>(ret_buffer.data()), offset, size);
+    return ret_buffer;
+  }
+}
+
+std::unique_ptr<const Reader>
+FileReader::sub_reader(offset_t offset, zsize_t size) const
+{
+  ASSERT(offset.v+size.v, <=, _size.v);
+  return std::unique_ptr<const Reader>(new FileReader(*this, _offset + offset, size));
 }
 
 } // zim

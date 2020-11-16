@@ -21,10 +21,36 @@
 #define ZIM_FILE_READER_H_
 
 #include "reader.h"
+#include "fs.h"
 
 namespace zim {
 
 class FileCompound;
+
+class FileReader : public Reader {
+  public:
+    explicit FileReader(int fd);
+    ~FileReader() = default;
+
+    zsize_t size() const { return _size; };
+    offset_t offset() const { return _offset; };
+
+    char read(offset_t offset) const;
+    void read(char* dest, offset_t offset, zsize_t size) const;
+    const Buffer get_buffer(offset_t offset, zsize_t size) const;
+
+    std::unique_ptr<const Reader> sub_reader(offset_t offset, zsize_t size) const;
+
+  private:
+    FileReader(const FileReader& fr, offset_t offset, zsize_t size);
+
+    // The file handle is stored via a shared pointer so that it can be shared
+    // by a sub_reader (otherwise the file handle would be invalidated by
+    // FD destructor when the sub-reader is destroyed).
+    std::shared_ptr<DEFAULTFS::FD> _fhandle;
+    offset_t _offset;
+    zsize_t _size;
+};
 
 class MultiPartFileReader : public Reader {
   public:
@@ -38,7 +64,7 @@ class MultiPartFileReader : public Reader {
     void read(char* dest, offset_t offset, zsize_t size) const;
     const Buffer get_buffer(offset_t offset, zsize_t size) const;
 
-    std::unique_ptr<const Reader> sub_reader(offset_t offest, zsize_t size) const;
+    std::unique_ptr<const Reader> sub_reader(offset_t offset, zsize_t size) const;
 
   private:
     MultiPartFileReader(std::shared_ptr<const FileCompound> source, offset_t offset);
