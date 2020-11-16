@@ -50,14 +50,14 @@ FileCompound::FileCompound(const std::string& filename):
     _fsize = zsize_t(0);
     for (char ch0 = 'a'; ch0 <= 'z'; ++ch0)
     {
-      const std::string fname0 = filename + ch0;
-      for (char ch1 = 'a'; ch1 <= 'z'; ++ch1)
-      {
-        try {
+      try {
+        const std::string fname0 = filename + ch0;
+        for (char ch1 = 'a'; ch1 <= 'z'; ++ch1)
+        {
           addPart(new FilePart<>(fname0 + ch1));
-        } catch (...) {
-          break;
         }
+      } catch (...) {
+        break;
       }
     }
 
