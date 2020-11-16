@@ -70,7 +70,7 @@ sectionSubReader(const Reader& zimReader, const std::string& sectionName,
   //
   FileImpl::FileImpl(const std::string& fname)
     : zimFile(new FileCompound(fname)),
-      zimReader(new FileReader(zimFile)),
+      zimReader(new MultiPartFileReader(zimFile)),
       bufferDirentZone(256),
       bufferDirentLock(PTHREAD_MUTEX_INITIALIZER),
       filename(fname),
