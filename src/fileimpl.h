@@ -47,7 +47,6 @@ namespace zim
       std::vector<char> bufferDirentZone;
       pthread_mutex_t bufferDirentLock;
       Fileheader header;
-      std::string filename;
 
       std::unique_ptr<const Reader> titleIndexReader;
       std::unique_ptr<const Reader> urlPtrOffsetReader;
@@ -74,7 +73,7 @@ namespace zim
 
       time_t getMTime() const;
 
-      const std::string& getFilename() const   { return filename; }
+      const std::string& getFilename() const   { return zimFile->filename(); }
       const Fileheader& getFileheader() const  { return header; }
       zsize_t getFilesize() const;
 

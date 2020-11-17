@@ -41,6 +41,7 @@ void FileCompound::addPart(FilePart<>* fpart)
 }
 
 FileCompound::FileCompound(const std::string& filename):
+  _filename(filename),
   _fsize(0)
 {
   try {
@@ -71,6 +72,7 @@ FileCompound::FileCompound(const std::string& filename):
 }
 
 FileCompound::FileCompound(int fd):
+  _filename(),
   _fsize(0)
 {
   addPart(new FilePart<>(fd));
