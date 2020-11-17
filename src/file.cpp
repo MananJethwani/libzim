@@ -51,6 +51,10 @@ namespace zim
     : impl(new FileImpl(fd))
     { }
 
+  File::File(int fd, offset_type offset, size_type size)
+    : impl(new FileImpl(fd, offset_t(offset), zsize_t(size)))
+    { }
+
   const std::string& File::getFilename() const
   {
     return impl->getFilename();

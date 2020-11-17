@@ -44,6 +44,7 @@ namespace zim
         { }
       explicit File(const std::string& fname);
       explicit File(int fd);
+      File(int fd, offset_type offset, size_type size);
 
       const std::string& getFilename() const;
       const Fileheader& getFileheader() const;

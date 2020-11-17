@@ -20,6 +20,12 @@ zimwriterfs -w main.html \
 && echo 'small.zim was successfully created' \
 || die 'Failed to create small.zim'
 
+printf "BEGINZIM" > small.zim.embedded \
+&& cat small.zim >> small.zim.embedded \
+&& printf "ENDZIM" >> small.zim.embedded \
+&& echo 'small.zim.embedded was successfully created' \
+|| die 'Failed to create small.zim.embedded'
+
 zimfilesize=$(wc -c < small.zim)
 
 zimheader=$(./inspectzim --header small.zim|tail -n +2)

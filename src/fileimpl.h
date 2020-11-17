@@ -71,6 +71,7 @@ namespace zim
     public:
       explicit FileImpl(const std::string& fname);
       explicit FileImpl(int fd);
+      FileImpl(int fd, offset_t offset, zsize_t size);
 
       time_t getMTime() const;
 
@@ -111,6 +112,7 @@ namespace zim
       bool checkIntegrity(IntegrityCheck checkType);
   private:
       explicit FileImpl(std::shared_ptr<FileCompound> zimFile);
+      FileImpl(std::shared_ptr<FileCompound> zimFile, offset_t offset, zsize_t size);
 
       DirentLookup& direntLookup();
       ClusterHandle readCluster(cluster_index_t idx);

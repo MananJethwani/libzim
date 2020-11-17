@@ -313,4 +313,13 @@ TEST(ZimFile, openByFD)
   checkEquivalence(zimfile1, zimfile2);
 }
 
+TEST(ZimFile, openZIMFileEmbeddedInAnotherFile)
+{
+  const zim::File zimfile1("./data/small.zim");
+  const int fd = open("./data/small.zim.embedded", O_RDONLY);
+  const zim::File zimfile2(fd, 8, zimfile1.getFilesize());
+
+  checkEquivalence(zimfile1, zimfile2);
+}
+
 } // unnamed namespace
