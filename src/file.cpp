@@ -47,6 +47,10 @@ namespace zim
     : impl(new FileImpl(fname))
     { }
 
+  File::File(int fd)
+    : impl(new FileImpl(fd))
+    { }
+
   const std::string& File::getFilename() const
   {
     return impl->getFilename();

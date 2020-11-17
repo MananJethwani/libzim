@@ -43,6 +43,7 @@ namespace zim
       File()
         { }
       explicit File(const std::string& fname);
+      explicit File(int fd);
 
       const std::string& getFilename() const;
       const Fileheader& getFileheader() const;
