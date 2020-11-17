@@ -70,6 +70,7 @@ namespace zim
 
     public:
       explicit FileImpl(const std::string& fname);
+      explicit FileImpl(int fd);
 
       time_t getMTime() const;
 
