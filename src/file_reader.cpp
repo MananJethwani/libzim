@@ -230,6 +230,13 @@ FileReader::FileReader(int fd)
 {
 }
 
+FileReader::FileReader(FileHandle fh)
+  : _fhandle(fh)
+  , _offset(0)
+  , _size(_fhandle->getSize())
+{
+}
+
 FileReader::FileReader(const FileReader& freader, offset_t offset, zsize_t size)
   : _fhandle(freader._fhandle)
   , _offset(offset)

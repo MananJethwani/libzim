@@ -63,6 +63,11 @@ sectionSubReader(const Reader& zimReader, const std::string& sectionName,
 #endif
 }
 
+struct NoDelete
+{
+  template<class T> void operator()(T*) {}
+};
+
 std::shared_ptr<Reader>
 makeFileReader(std::shared_ptr<const FileCompound> zimFile)
 {
@@ -72,7 +77,8 @@ makeFileReader(std::shared_ptr<const FileCompound> zimFile)
     return std::make_shared<MultiPartFileReader>(zimFile);
   else {
     const auto& firstAndOnlyPart = zimFile->begin()->second;
-    return std::make_shared<FileReader>(firstAndOnlyPart->fhandle().getNativeHandle());
+    const FileReader::FileHandle fh(&firstAndOnlyPart->fhandle(), NoDelete());
+    return std::make_shared<FileReader>(fh);
   }
 }
 

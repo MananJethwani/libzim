@@ -28,8 +28,12 @@ namespace zim {
 class FileCompound;
 
 class FileReader : public Reader {
-  public:
+  public: // types
+    typedef std::shared_ptr<const DEFAULTFS::FD> FileHandle;
+
+  public: // functions
     explicit FileReader(int fd);
+    explicit FileReader(FileHandle fh);
     ~FileReader() = default;
 
     zsize_t size() const { return _size; };
@@ -41,13 +45,14 @@ class FileReader : public Reader {
 
     std::unique_ptr<const Reader> sub_reader(offset_t offset, zsize_t size) const;
 
-  private:
+  private: // functions
     FileReader(const FileReader& fr, offset_t offset, zsize_t size);
 
+  private: // data
     // The file handle is stored via a shared pointer so that it can be shared
     // by a sub_reader (otherwise the file handle would be invalidated by
     // FD destructor when the sub-reader is destroyed).
-    std::shared_ptr<DEFAULTFS::FD> _fhandle;
+    FileHandle _fhandle;
     offset_t _offset;
     zsize_t _size;
 };
