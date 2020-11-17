@@ -223,13 +223,6 @@ std::unique_ptr<const Reader> MultiPartFileReader::sub_reader(offset_t offset, z
 // FileReader
 ////////////////////////////////////////////////////////////////////////////////
 
-FileReader::FileReader(int fd)
-  : _fhandle(std::make_shared<DEFAULTFS::FD>(fd))
-  , _offset(0)
-  , _size(_fhandle->getSize())
-{
-}
-
 FileReader::FileReader(FileHandle fh)
   : _fhandle(fh)
   , _offset(0)

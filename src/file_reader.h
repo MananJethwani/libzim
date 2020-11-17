@@ -32,7 +32,6 @@ class FileReader : public Reader {
     typedef std::shared_ptr<const DEFAULTFS::FD> FileHandle;
 
   public: // functions
-    explicit FileReader(int fd);
     explicit FileReader(FileHandle fh);
     ~FileReader() = default;
 
