@@ -88,7 +88,11 @@ makeFileReader(std::shared_ptr<const FileCompound> zimFile)
   // FileImpl
   //
   FileImpl::FileImpl(const std::string& fname)
-    : zimFile(new FileCompound(fname)),
+    : FileImpl(std::make_shared<FileCompound>(fname))
+  {}
+
+  FileImpl::FileImpl(std::shared_ptr<FileCompound> _zimFile)
+    : zimFile(_zimFile),
       zimReader(makeFileReader(zimFile)),
       bufferDirentZone(256),
       bufferDirentLock(PTHREAD_MUTEX_INITIALIZER),
